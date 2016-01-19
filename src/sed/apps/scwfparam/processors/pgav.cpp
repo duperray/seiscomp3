@@ -525,6 +525,15 @@ void PGAV::setPadLength(double len) {
 
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+void PGAV::setClipTmaxToLowestFilterFrequency(bool f) {
+	_config.clipTmax = true;
+}
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 void PGAV::setNonCausalFiltering(bool f, double taperLength) {
 	_config.noncausal = f;
 	_config.taperLength = taperLength;
@@ -1326,6 +1335,18 @@ void PGAV::process(const Record *record, const DoubleArray &) {
 	double Tmin = _config.Tmin;
 	double Tmax = _config.Tmax;
 
+	if ( _config.clipTmax ) {
+		double loFreq = std::max(_config.loPDFreq, _config.loFilterFreq);
+		// Use an epsilon of 1E-20 to take it as zero
+		if ( loFreq > 1E-20 ) {
+			double tmpTmax = 1.0 / loFreq;
+			if ( tmpTmax < Tmax ) {
+				Tmax = tmpTmax;
+				SEISCOMP_DEBUG(">  adjust Tmax = %f to stay within filter bands", Tmax);
+			}
+		}
+	}
+
 	vector<double> T;
 
 	if ( !_config.fixedPeriods ) {
@@ -1450,6 +1471,7 @@ void PGAV::init() {
 	setFilterParams(0,0,0);
 	setNonCausalFiltering(false, -1);
 	setPadLength(-1);
+	setClipTmaxToLowestFilterFrequency(true);
 
 	_config.saturationThreshold = -1;
 
