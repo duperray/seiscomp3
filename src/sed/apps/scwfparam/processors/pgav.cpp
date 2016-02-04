@@ -1382,8 +1382,18 @@ void PGAV::process(const Record *record, const DoubleArray &) {
 			T.push_back(Tmin);
 	}
 	else {
-		SEISCOMP_DEBUG(">  using fixed natural periods table");
-		T.assign(FIXED_PERIODS, FIXED_PERIODS + sizeof(FIXED_PERIODS)/sizeof(double));
+		if ( _config.clipTmax ) {
+			SEISCOMP_DEBUG(">  using fixed natural periods table cut by Tmax = %f", Tmax);
+			int len = sizeof(FIXED_PERIODS)/sizeof(double);
+			for ( int i = 0; i < len; ++i ) {
+				if ( FIXED_PERIODS[i] <= Tmax )
+					T.push_back(FIXED_PERIODS[i]);
+			}
+		}
+		else {
+			SEISCOMP_DEBUG(">  using fixed natural periods table");
+			T.assign(FIXED_PERIODS, FIXED_PERIODS + sizeof(FIXED_PERIODS)/sizeof(double));
+		}
 	}
 
 	_responseSpectra.clear();
