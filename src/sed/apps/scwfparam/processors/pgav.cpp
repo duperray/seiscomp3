@@ -526,7 +526,7 @@ void PGAV::setPadLength(double len) {
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 void PGAV::setClipTmaxToLowestFilterFrequency(bool f) {
-	_config.clipTmax = true;
+	_config.clipTmax = f;
 }
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
